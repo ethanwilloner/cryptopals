@@ -50,7 +50,7 @@ def xorCipher(hex_str):
         out = xorWithChar(char, hex_str)
         outputArray.append(out)
 
-    return scoreOutput(outputArray)
+    return outputArray
 
 def xorWithChar(key, hex_str):
     out = bytearray(b'')
@@ -58,40 +58,67 @@ def xorWithChar(key, hex_str):
         out.append(key ^ b)
     return out
 
-def scoreOutput(outputArray):
-    out = []
-    for msg in outputArray:
+# We use a very naive filtering system
+# If the string contains characters outside
+# alphanumerics and some punctuation, dont bother with it
+def simpleFilter(inputArray):
+    outputArray = []
+    for msg in inputArray:
         illegalChar = False
         for char in msg:
             illegalChar = isIllegalChar(char)
             if illegalChar == True:
                 break
         if illegalChar == False:
-            out.append(msg)
+            outputArray.append(msg)
         illegalChar = False
    
-    return out[0]
+    return outputArray
 
 def isIllegalChar(char):
     if char < 32:
         return True
     if char > 122:
         return True
-    if char > 90 and char < 97:
-        return True
-    if char >57 and char < 6:
-        return True
 
     return False
 
 def q3():
     hex_str = b'1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736'
-    out = xorCipher(hex_str)
-    prettyOut(1, 3, out)
+    out = simpleFilter(xorCipher(hex_str))
+    prettyOut(1, 3, out[0])
     return
+
+def generateXorSet(inputArray):
+    tmpArray = []
+    for i in inputArray:
+        # Store each byte string with the number of spaces present in it
+        # as there is a good chance only a proper sentence will have a lot of them
+        tmpArray.append([i,commonWordCount(i)])
+    return tmpArray
+
+# return occurrences of common words
+def commonWordCount(message):
+    commonWords = ["the", "a", "if", "is", "of", " "]
+    wordCount = 0
+    for w in commonWords:
+        if bytes(w, 'ascii') in message:
+            wordCount += 1
+    return wordCount
+
+def q4():
+    with open('4.txt') as f:
+        outputArray = []
+        for line in f:
+            out = xorCipher(bytes(line.strip(), 'ascii'))
+            for i in out:
+                outputArray.append(i)
+        tmpArray = generateXorSet(outputArray)
+        prettyOut(1, 4, sorted(tmpArray, key = lambda x: x[1], reverse=True)[0][0])
+    return 
 
 if __name__ == "__main__":
        q1()
        q2()
        q3()
-
+       q4()
