@@ -2,9 +2,10 @@
 
 import base64
 import binascii
+from itertools import cycle
 
 def prettyOut(setNum, chalNum, out):
-    print("Set {}, Challenge {},: {}".format(setNum, chalNum, out.decode('ascii')))
+    print("Set {}, Challenge {}: {}".format(setNum, chalNum, out.decode('ascii')))
 
 def hextobase64(hex_str):
     # Convert the hex (binary) string to bytes, unhexlify, encode as base64, and then decode to ascii
@@ -117,8 +118,29 @@ def q4():
         prettyOut(1, 4, sorted(tmpArray, key = lambda x: x[1], reverse=True)[0][0])
     return 
 
+def repeatingKeyXor(key, text):
+    bytestring = bytes(x ^ y for x,y in zip(cycle(bytes(key, 'ascii')), bytes(text, 'ascii')))
+    return binascii.hexlify(bytestring) 
+
+def q5():
+    key = 'ICE'
+    plaintext = '''Burning 'em, if you ain't quick and nimble
+I go crazy when I hear a cymbal'''
+    ciphertext = repeatingKeyXor(key, plaintext)
+    prettyOut(1, 5, ciphertext)
+    return
+
+def q6():
+
+    prettyOut(1, 6, b'')
+    return
+
+
+
 if __name__ == "__main__":
-       q1()
-       q2()
-       q3()
-       q4()
+       #q1()
+       #q2()
+       #q3()
+       #q4()
+       q5()
+       q6()
