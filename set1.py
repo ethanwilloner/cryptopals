@@ -5,7 +5,7 @@ import binascii
 from itertools import cycle
 
 def prettyOut(setNum, chalNum, out):
-    print("Set {}, Challenge {}: {}".format(setNum, chalNum, out.decode('ascii')))
+    print("Set {}, Challenge {}: {}".format(setNum, chalNum, out.decode('ascii')).strip())
 
 def hextobase64(hex_str):
     # Convert the hex (binary) string to bytes, unhexlify, encode as base64, and then decode to ascii
@@ -130,17 +130,54 @@ I go crazy when I hear a cymbal'''
     prettyOut(1, 5, ciphertext)
     return
 
+def hammingDistance(str1, str2):
+    differingBits = 0
+    if len(str1) != len(str2):
+        return None
+    else:
+        if type(str1) is str and type(str2) is str:
+            for i,j in zip(str1, str2):
+                differingBits += bin(ord(i) ^ ord(j)).count('1')
+        elif type(str1) is bytes and type(str2) is bytes:
+             for i,j in zip(str1, str2):
+                differingBits += bin(i ^ j).count('1')
+        else:
+            # type mismatch
+            return None
+    return differingBits
+
+def breakRepeatingKeyXor(fileName):
+    bytesFile = None
+    with open(fileName, 'rb') as f:
+        bytesFile = base64.b64decode(f.read())
+   
+    hamDistTable = []
+    for KEYSIZE in range(2, 51):
+        hamDistTable.append([KEYSIZE, hammingDistance(bytesFile[:KEYSIZE], bytesFile[KEYSIZE:KEYSIZE*2])//KEYSIZE]) 
+    
+    keysizeGuess = sorted((x for x in hamDistTable), key =  lambda x: x[1])[:2]
+
+    print(keysizeGuess)
+    return None
+
 def q6():
+    if hammingDistance('this is a test', 'wokka wokka!!!') != 37:
+        prettyOut(1, 6, b'Hamming Distance calculation is broken!')
+        return
+   
+    if hammingDistance(b'this is a test', b'wokka wokka!!!') != 37:
+        prettyOut(1, 6, b'Hamming Distance 2 calculation is broken!')
+        return
+
+    output = breakRepeatingKeyXor('6.txt')
 
     prettyOut(1, 6, b'')
     return
 
-
-
 if __name__ == "__main__":
-       #q1()
-       #q2()
-       #q3()
-       #q4()
+       q1()
+       q2()
+       q3()
+       q4()
        q5()
        q6()
